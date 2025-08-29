@@ -1,3 +1,0 @@
-[hook] Hook library loaded, looking for real write()...
-[hook] Successfully hooked write() function
-[hook] Found 'kitty' in output, replacing with 'CHANGED-KITTY'
