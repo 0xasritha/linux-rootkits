@@ -349,20 +349,6 @@ int puts(const char *message) {
 
 ---
 
-# TODO:
-
-### 1.1 A noisy keylogger
-
-- get from the yt video + then add reach out to netcat server via json
-- 3 noise avenues we want to hide: `ls`, `ps`, and network traffic; there are prolly other noise avenues (figure these out to list examples), but let's focus on these three
-
-### 1.2 Simulated crypto miner that doesnt actually mine a coin but creates the same CPU spikes as a bitcoin miner would, netcat server
-
-- ask chat
-- the additional stuff to hide would be the cpu spike
-
----
-
 # Resources
 
 - https://www.first.org/resources/papers/amsterdam25/FIRST_Amsterdam_2025_Linux_Rootkits.pdf
